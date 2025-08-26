@@ -11,8 +11,8 @@ router.get('/public', async (req, res) => {
     
     // Convert PostgreSQL JSON fields back to arrays and remove sensitive info
     const properties = props.map(prop => ({
-      _id: prop._id,
-      id: prop._id,
+      _id: prop.id,   // Use prop.id from database
+      id: prop.id,    // Use prop.id from database
       name: prop.name,
       address: prop.address,
       city: prop.city,
@@ -49,8 +49,8 @@ router.get('/public/:id', async (req, res) => {
 
     // Convert PostgreSQL JSON fields back to arrays and remove sensitive info
     const property = {
-      _id: prop._id,
-      id: prop._id,
+      _id: prop.id,   // Use prop.id from database
+      id: prop.id,    // Use prop.id from database
       name: prop.name,
       address: prop.address,
       city: prop.city,
@@ -127,11 +127,24 @@ router.get('/', authRequired, async (req, res) => {
   try {
     const props = await Property.findByUserId(req.user.id);
     
-    // Convert PostgreSQL JSON fields back to arrays
+    // Convert PostgreSQL JSON fields back to arrays and transform field names
     const properties = props.map(prop => ({
-      ...prop,
+      _id: prop.id,  // Use prop.id from database
+      id: prop.id,   // Use prop.id from database
+      name: prop.name,
+      address: prop.address,
+      city: prop.city,
+      description: prop.description,
+      pricePerNight: prop.price_per_night,
+      maxGuests: prop.max_guests,
+      bedrooms: prop.bedrooms,
+      bathrooms: prop.bathrooms,
       amenities: typeof prop.amenities === 'string' ? JSON.parse(prop.amenities) : prop.amenities,
-      images: typeof prop.images === 'string' ? JSON.parse(prop.images) : prop.images
+      images: typeof prop.images === 'string' ? JSON.parse(prop.images) : prop.images,
+      houseRules: prop.house_rules,
+      user_id: prop.user_id,
+      created_at: prop.created_at,
+      updated_at: prop.updated_at
     }));
     
     res.json({
@@ -162,11 +175,24 @@ router.get('/:id', authRequired, async (req, res) => {
       return res.status(404).json({ message: 'Property not found' });
     }
 
-    // Convert PostgreSQL JSON fields back to arrays
+    // Convert PostgreSQL JSON fields back to arrays and transform field names
     const property = {
-      ...prop,
+      _id: prop.id,  // Use prop.id from database
+      id: prop.id,   // Use prop.id from database
+      name: prop.name,
+      address: prop.address,
+      city: prop.city,
+      description: prop.description,
+      pricePerNight: prop.price_per_night,
+      maxGuests: prop.max_guests,
+      bedrooms: prop.bedrooms,
+      bathrooms: prop.bathrooms,
       amenities: typeof prop.amenities === 'string' ? JSON.parse(prop.amenities) : prop.amenities,
-      images: typeof prop.images === 'string' ? JSON.parse(prop.images) : prop.images
+      images: typeof prop.images === 'string' ? JSON.parse(prop.images) : prop.images,
+      houseRules: prop.house_rules,
+      user_id: prop.user_id,
+      created_at: prop.created_at,
+      updated_at: prop.updated_at
     };
 
     res.json({
