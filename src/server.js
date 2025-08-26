@@ -24,8 +24,10 @@ const allowedOrigins = [
   'http://localhost:5173', // Vite React app
   'http://localhost:5174',
   process.env.CLIENT_URL,
-  // Add your production frontend URL when deployed
-  'https://your-frontend-app.onrender.com'
+  // Production frontend URLs
+  'https://propstream-frontend.vercel.app',
+  'https://propstream-frontend-git-main-uvaancovies-projects.vercel.app',
+  'https://propstream-frontend-*.vercel.app' // All Vercel preview deployments
 ].filter(Boolean);
 
 app.use(cors({ 
@@ -33,13 +35,19 @@ app.use(cors({
     // Allow requests with no origin (mobile apps, etc.)
     if (!origin) return callback(null, true);
     
-    if (allowedOrigins.includes(origin)) {
+    // Check for exact match or Vercel domain pattern
+    if (allowedOrigins.includes(origin) || 
+        (origin && origin.includes('propstream-frontend') && origin.includes('vercel.app'))) {
       return callback(null, true);
     }
     
+    // Log rejected origins for debugging
+    console.log('CORS rejected origin:', origin);
     return callback(new Error('Not allowed by CORS'), false);
   },
-  credentials: true 
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
 }));
 
 app.use(express.json());
