@@ -11,9 +11,9 @@ router.post('/register', async (req, res) => {
     const schema = Joi.object({ 
       email: Joi.string().email().required(), 
       password: Joi.string().min(6).required(), 
-      name: Joi.string().allow('').required()
-      // Temporarily removed role validation until DB migration
-      // role: Joi.string().valid('client', 'realtor').default('client')
+      name: Joi.string().allow('').required(),
+      // Accept role field but ignore it for now until DB migration
+      role: Joi.string().valid('client', 'realtor').optional().default('client')
     });
     const { error, value } = schema.validate(req.body);
     if (error) return res.status(400).json({ 
