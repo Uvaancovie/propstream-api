@@ -71,23 +71,3 @@ export function authenticatedOnly(req, res, next) {
   }
   next();
 }
-
-// Middleware to check if user is a realtor
-export function realtorOnly(req, res, next) {
-  if (req.user.role !== 'realtor') {
-    return res.status(403).json({ 
-      message: '❌ Access denied. Realtor privileges required.' 
-    });
-  }
-  next();
-}
-
-// Middleware to check if user is a client
-export function clientOnly(req, res, next) {
-  if (req.user.role !== 'client') {
-    return res.status(403).json({ 
-      message: '❌ Access denied. Client privileges required.' 
-    });
-  }
-  next();
-}
