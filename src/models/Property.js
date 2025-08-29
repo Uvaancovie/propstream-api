@@ -14,19 +14,29 @@ export class Property {
       bedrooms,
       bathrooms,
       amenities = [],
-      images = []
+      images = [],
+      property_type = 'apartment',
+      available_from = null,
+      available_to = null,
+      realtor_name = '',
+      realtor_email = '',
+      realtor_phone = '',
+      is_available = true
     } = propertyData;
 
     const result = await sql`
       INSERT INTO properties (
         user_id, name, description, address, city, 
         price_per_night, max_guests, bedrooms, bathrooms, 
-        amenities, images
+        amenities, images, property_type, available_from, available_to,
+        realtor_name, realtor_email, realtor_phone, is_available
       )
       VALUES (
         ${user_id}, ${name}, ${description}, ${address}, ${city},
         ${price_per_night}, ${max_guests}, ${bedrooms}, ${bathrooms},
-        ${JSON.stringify(amenities)}, ${JSON.stringify(images)}
+        ${JSON.stringify(amenities)}, ${JSON.stringify(images)},
+        ${property_type}, ${available_from}, ${available_to},
+        ${realtor_name}, ${realtor_email}, ${realtor_phone}, ${is_available}
       )
       RETURNING *
     `;

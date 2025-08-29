@@ -12,6 +12,9 @@ const corsMiddleware = (req, res, next) => {
     'http://localhost:3005',
     'http://localhost:3006',
     'http://localhost:5173',  // Vite dev server
+    'http://localhost:5174',  // Vite dev server (alternate port)
+    'http://localhost:5175',  // Vite dev server (alternate port)
+    'http://localhost:5176',  // Vite dev server (alternate port)
     'https://propstream-frontend.vercel.app',  // Your Vercel deployment
     'https://propstream-frontend-*.vercel.app' // Vercel preview deployments
   ];

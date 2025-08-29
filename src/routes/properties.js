@@ -77,45 +77,67 @@ router.get('/public/:id', async (req, res) => {
 });
 
 // Create (temporarily without realtor restriction for demo)
-router.post('/', authRequired, async (req, res) => {
+router.post('/', authRequired, realtorOnly, async (req, res) => {
   try {
     const { 
-      name, address, city, description, 
-      pricePerNight, maxGuests, bedrooms, bathrooms,
-      amenities, images 
+      title, location, description, 
+      price_per_night, max_guests, bedrooms, bathrooms,
+      amenities, image_url, property_type,
+      available_from, available_to,
+      realtor_name, realtor_email, realtor_phone
     } = req.body;
     
-    if (!name) {
+    if (!title || !location || !price_per_night) {
       return res.status(400).json({
-        message: "❌ Property name is required",
-        hint: "Please provide a name for your property"
+        message: "❌ Title, location, and price per night are required",
+        hint: "Please provide all required fields"
       });
     }
     
+    // Convert amenities string to array if needed
+    let amenitiesArray = [];
+    if (amenities) {
+      amenitiesArray = typeof amenities === 'string' 
+        ? amenities.split(',').map(item => item.trim()).filter(item => item)
+        : amenities;
+    }
+    
+    // Create property with realtor information
     const property = await Property.create({ 
       user_id: req.user.id, 
-      name,
-      address,
-      city,
-      description, 
-      price_per_night: pricePerNight, 
-      max_guests: maxGuests, 
-      bedrooms, 
-      bathrooms,
-      amenities: amenities || [], 
-      images: images || []
+      name: title,
+      address: location,
+      city: location.split(',')[1]?.trim() || location,
+      description: description || '', 
+      price_per_night: parseFloat(price_per_night), 
+      max_guests: parseInt(max_guests) || 2, 
+      bedrooms: parseInt(bedrooms) || 1, 
+      bathrooms: parseFloat(bathrooms) || 1,
+      amenities: amenitiesArray, 
+      images: image_url ? [image_url] : [],
+      property_type: property_type || 'apartment',
+      available_from: available_from || null,
+      available_to: available_to || null,
+      realtor_name: realtor_name || req.user.name,
+      realtor_email: realtor_email || req.user.email,
+      realtor_phone: realtor_phone || '',
+      is_available: true
     });
     
     res.status(201).json({
+      success: true,
       message: "✅ Property created successfully!",
       property,
       nextSteps: [
-        "Create bookings: POST /api/bookings",
-        "View your properties: GET /api/properties"
+        "View on browse properties page",
+        "Manage bookings in calendar",
+        "Update property details anytime"
       ]
     });
   } catch (error) {
+    console.error('❌ Property creation error:', error);
     res.status(500).json({ 
+      success: false,
       message: "❌ Failed to create property", 
       error: error.message 
     });
