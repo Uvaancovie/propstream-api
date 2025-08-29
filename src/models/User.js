@@ -2,14 +2,14 @@ import { getSQL } from '../config/neon.js';
 import bcrypt from 'bcryptjs';
 
 export class User {
-  static async create({ name, email, password, role = 'client' }) {
+  static async create({ name, email, password }) {
     const sql = getSQL();
     const passwordHash = await bcrypt.hash(password, 10);
     
     const result = await sql`
-      INSERT INTO users (name, email, password, role)
-      VALUES (${name}, ${email}, ${passwordHash}, ${role})
-      RETURNING id, name, email, role, created_at, updated_at
+      INSERT INTO users (name, email, password)
+      VALUES (${name}, ${email}, ${passwordHash})
+      RETURNING id, name, email, created_at, updated_at
     `;
     
     console.log('✅ User created successfully:', result[0]);
@@ -30,7 +30,7 @@ export class User {
     const sql = getSQL();
     
     const result = await sql`
-      SELECT id, name, email, role, created_at, updated_at FROM users WHERE id = ${id}
+      SELECT id, name, email, created_at, updated_at FROM users WHERE id = ${id}
     `;
     
     return result[0] || null;

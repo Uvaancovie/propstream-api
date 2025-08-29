@@ -11,14 +11,15 @@ router.post('/register', async (req, res) => {
     const schema = Joi.object({ 
       email: Joi.string().email().required(), 
       password: Joi.string().min(6).required(), 
-      name: Joi.string().allow('').required(),
-      role: Joi.string().valid('client', 'realtor').default('client')
+      name: Joi.string().allow('').required()
+      // Temporarily removed role validation until DB migration
+      // role: Joi.string().valid('client', 'realtor').default('client')
     });
     const { error, value } = schema.validate(req.body);
     if (error) return res.status(400).json({ 
       message: "❌ Validation failed", 
       error: error.message,
-      hint: "Email must be valid, password must be at least 6 characters, role must be 'client' or 'realtor'"
+      hint: "Email must be valid, password must be at least 6 characters"
     });
     
     const exists = await User.findByEmail(value.email);
@@ -30,18 +31,17 @@ router.post('/register', async (req, res) => {
     const user = await User.create({ 
       email: value.email, 
       password: value.password, 
-      name: value.name,
-      role: value.role 
+      name: value.name
     });
     
     const token = jwt.sign({ 
       id: user.id, 
       email: user.email, 
-      role: user.role 
+      role: 'client' // temporary default 
     }, process.env.JWT_SECRET, { expiresIn: '7d' });
     
     res.json({ 
-      message: `✅ Registration successful! Welcome to Propstream as a ${value.role}!`,
+      message: `✅ Registration successful! Welcome to Propstream!`,
       token, 
       user: { 
         id: user.id, 
