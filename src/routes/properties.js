@@ -76,8 +76,8 @@ router.get('/public/:id', async (req, res) => {
   }
 });
 
-// Create
-router.post('/', authRequired, realtorOnly, async (req, res) => {
+// Create (temporarily without realtor restriction for demo)
+router.post('/', authRequired, async (req, res) => {
   try {
     const { 
       name, address, city, description, 
