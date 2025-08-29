@@ -11,13 +11,14 @@ router.post('/register', async (req, res) => {
     const schema = Joi.object({ 
       email: Joi.string().email().required(), 
       password: Joi.string().min(6).required(), 
-      name: Joi.string().allow('').required()
+      name: Joi.string().allow('').required(),
+      role: Joi.string().valid('client', 'realtor').default('client')
     });
     const { error, value } = schema.validate(req.body);
     if (error) return res.status(400).json({ 
       message: "❌ Validation failed", 
       error: error.message,
-      hint: "Email must be valid, password must be at least 6 characters"
+      hint: "Email must be valid, password must be at least 6 characters, role must be 'client' or 'realtor'"
     });
     
     const exists = await User.findByEmail(value.email);
@@ -29,19 +30,33 @@ router.post('/register', async (req, res) => {
     const user = await User.create({ 
       email: value.email, 
       password: value.password, 
-      name: value.name 
+      name: value.name,
+      role: value.role 
     });
     
-    const token = jwt.sign({ id: user.id, email: user.email }, process.env.JWT_SECRET, { expiresIn: '7d' });
+    const token = jwt.sign({ 
+      id: user.id, 
+      email: user.email, 
+      role: user.role 
+    }, process.env.JWT_SECRET, { expiresIn: '7d' });
     
     res.json({ 
-      message: "✅ Registration successful! Welcome to Propstream!",
+      message: `✅ Registration successful! Welcome to Propstream as a ${value.role}!`,
       token, 
-      user: { id: user.id, email: user.email, name: user.name },
-      nextSteps: [
+      user: { 
+        id: user.id, 
+        email: user.email, 
+        name: user.name, 
+        role: user.role 
+      },
+      nextSteps: value.role === 'realtor' ? [
         "Save your token for authenticated requests",
         "Create your first property: POST /api/properties",
         "Set up calendar integrations for bookings"
+      ] : [
+        "Save your token for authenticated requests",
+        "Browse properties: GET /api/properties/public",
+        "Book your first stay!"
       ]
     });
   } catch (error) {
@@ -73,11 +88,21 @@ router.post('/login', async (req, res) => {
       hint: "Check your password"
     });
     
-    const token = jwt.sign({ id: user.id, email: user.email }, process.env.JWT_SECRET, { expiresIn: '7d' });
+    const token = jwt.sign({ 
+      id: user.id, 
+      email: user.email, 
+      role: user.role || 'client' 
+    }, process.env.JWT_SECRET, { expiresIn: '7d' });
+    
     res.json({ 
-      message: "✅ Login successful! Welcome back!",
+      message: `✅ Login successful! Welcome back ${user.role || 'client'}!`,
       token, 
-      user: { id: user.id, email: user.email, name: user.name },
+      user: { 
+        id: user.id, 
+        email: user.email, 
+        name: user.name, 
+        role: user.role || 'client' 
+      },
       tokenInfo: {
         expiresIn: "7 days",
         usage: "Include as 'Authorization: Bearer <token>' in request headers"
@@ -102,7 +127,12 @@ router.get('/me', authRequired, async (req, res) => {
     }
     res.json({ 
       message: "✅ User profile retrieved successfully",
-      user: { id: user.id, email: user.email, name: user.name },
+      user: { 
+        id: user.id, 
+        email: user.email, 
+        name: user.name, 
+        role: user.role || 'client' 
+      },
       accountInfo: {
         memberSince: user.created_at,
         lastUpdated: user.updated_at

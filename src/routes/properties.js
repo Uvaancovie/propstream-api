@@ -1,5 +1,5 @@
 import express from 'express';
-import { authRequired } from '../middleware/auth.js';
+import { authRequired, realtorOnly } from '../middleware/auth.js';
 import Property from '../models/Property.js';
 
 const router = express.Router();
@@ -77,7 +77,7 @@ router.get('/public/:id', async (req, res) => {
 });
 
 // Create
-router.post('/', authRequired, async (req, res) => {
+router.post('/', authRequired, realtorOnly, async (req, res) => {
   try {
     const { 
       name, address, city, description, 
@@ -208,7 +208,7 @@ router.get('/:id', authRequired, async (req, res) => {
 });
 
 // Update property
-router.put('/:id', authRequired, async (req, res) => {
+router.put('/:id', authRequired, realtorOnly, async (req, res) => {
   try {
     const { 
       name, address, city, description, 
@@ -246,7 +246,7 @@ router.put('/:id', authRequired, async (req, res) => {
 });
 
 // Delete
-router.delete('/:id', authRequired, async (req, res) => {
+router.delete('/:id', authRequired, realtorOnly, async (req, res) => {
   try {
     const property = await Property.deleteById(req.params.id);
     if (!property) {

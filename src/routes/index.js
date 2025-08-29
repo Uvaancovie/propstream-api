@@ -7,6 +7,7 @@ import platforms from './platforms.js';
 import messages from './messages.js';
 import billing from './billing.js';
 import integrations from './integrations.js';
+import newsletter from './newsletter.js';
 
 const api = Router();
 api.use('/auth', auth);
@@ -17,5 +18,6 @@ api.use('/platforms', platforms);
 api.use('/messages', messages);
 api.use('/billing', billing);
 api.use('/integrations', integrations);
+api.use('/newsletter', newsletter);
 
 export default api;
