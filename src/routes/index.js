@@ -8,6 +8,7 @@ import messages from './messages.js';
 import billing from './billing.js';
 import integrations from './integrations.js';
 import newsletter from './newsletter.js';
+import waitlist from './waitlist.js';
 
 const api = Router();
 api.use('/auth', auth);
@@ -19,5 +20,6 @@ api.use('/messages', messages);
 api.use('/billing', billing);
 api.use('/integrations', integrations);
 api.use('/newsletter', newsletter);
+api.use('/waitlist', waitlist);
 
 export default api;

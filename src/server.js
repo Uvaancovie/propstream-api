@@ -4,7 +4,8 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
-import { connectNeonDB } from './config/neon.js';
+// Remove Neon import - using Supabase now
+// import { connectNeonDB } from './config/neon.js';
 import api from './routes/index.js';
 
 dotenv.config();
@@ -162,15 +163,11 @@ const PORT = process.env.PORT || 4000;
 
 console.log('🔧 Starting server...');
 console.log('🔧 PORT:', PORT);
-console.log('🔧 DATABASE_URL:', process.env.DATABASE_URL ? 'Set' : 'Not set');
+console.log('🔧 Using Supabase for database operations');
 
-connectNeonDB(process.env.DATABASE_URL).then(() => {
-  // Start the server
-  app.listen(PORT, '0.0.0.0', () => {
-    console.log(`🚀 API running on http://localhost:${PORT}`);
-    console.log(`🚀 Server listening on all interfaces (0.0.0.0:${PORT})`);
-  });
-}).catch((error) => {
-  console.error('❌ Failed to connect to database:', error);
-  process.exit(1);
+// Start server directly - no database connection required for Supabase
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`🚀 API running on http://localhost:${PORT}`);
+  console.log(`🚀 Server listening on all interfaces (0.0.0.0:${PORT})`);
+  console.log('✅ Supabase configuration ready');
 });

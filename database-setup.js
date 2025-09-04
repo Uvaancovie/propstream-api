@@ -66,6 +66,18 @@ async function setupDatabase() {
     `;
     console.log('✅ Added notes column to bookings table');
     
+    // Create waitlist table
+    await sql`
+      CREATE TABLE IF NOT EXISTS waitlist (
+        id SERIAL PRIMARY KEY,
+        email VARCHAR(255) UNIQUE NOT NULL,
+        source VARCHAR(50) DEFAULT 'landing',
+        joined_at TIMESTAMP DEFAULT NOW(),
+        created_at TIMESTAMP DEFAULT NOW()
+      )
+    `;
+    console.log('✅ Created waitlist table');
+    
     console.log('✅ Database schema updated successfully');
     
   } catch (error) {
